@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://www.rkpblog.tech/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.rkpblog.tech/" rel="alternate" type="text/html" /><updated>2020-05-01T17:43:28-05:00</updated><id>https://www.rkpblog.tech/feed.xml</id><title type="html">Rohith’s blog</title><subtitle>I write about tech.</subtitle><entry><title type="html">Configuring Pi-Hole with DNS over HTTPS</title><link href="https://www.rkpblog.tech/markdown/2020/04/30/pi-hole_setup.html" rel="alternate" type="text/html" title="Configuring Pi-Hole with DNS over HTTPS" /><published>2020-04-30T00:00:00-05:00</published><updated>2020-04-30T00:00:00-05:00</updated><id>https://www.rkpblog.tech/markdown/2020/04/30/pi-hole_setup</id><content type="html" xml:base="https://www.rkpblog.tech/markdown/2020/04/30/pi-hole_setup.html">&lt;h1 id=&quot;pi-hole-dns-over-https&quot;&gt;Pi-Hole DNS over HTTPS&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://www.rkpblog.tech/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.rkpblog.tech/" rel="alternate" type="text/html" /><updated>2020-05-01T17:47:55-05:00</updated><id>https://www.rkpblog.tech/feed.xml</id><title type="html">Rohith’s blog</title><subtitle>I write about tech.</subtitle><entry><title type="html">Configuring Pi-Hole with DNS over HTTPS</title><link href="https://www.rkpblog.tech/markdown/2020/04/30/pi-hole_setup.html" rel="alternate" type="text/html" title="Configuring Pi-Hole with DNS over HTTPS" /><published>2020-04-30T00:00:00-05:00</published><updated>2020-04-30T00:00:00-05:00</updated><id>https://www.rkpblog.tech/markdown/2020/04/30/pi-hole_setup</id><content type="html" xml:base="https://www.rkpblog.tech/markdown/2020/04/30/pi-hole_setup.html">&lt;h1 id=&quot;pi-hole-dns-over-https&quot;&gt;Pi-Hole DNS over HTTPS&lt;/h1&gt;
 &lt;p&gt;I just set up &lt;a href=&quot;https://en.wikipedia.org/wiki/DNS_over_HTTPS&quot;&gt;DNS over HTTPS&lt;/a&gt; using &lt;a href=&quot;https://docs.pi-hole.net/guides/dns-over-https/&quot;&gt;this guide&lt;/a&gt; on my &lt;a href=&quot;https://pi-hole.net&quot;&gt;pi-hole&lt;/a&gt; DNS sink.&lt;/p&gt;
 
 &lt;p&gt;Basically,&lt;/p&gt;
@@ -1345,7 +1345,7 @@ Total time: 06:39
 &lt;/div&gt;
 &lt;div class=&quot;cell border-box-sizing text_cell rendered&quot;&gt;&lt;div class=&quot;inner_cell&quot;&gt;
 &lt;div class=&quot;text_cell_render border-box-sizing rendered_html&quot;&gt;
-&lt;p&gt;&lt;img src=&quot;/blog/images/copied_from_nb/my_icons/fastai_logo.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/copied_from_nb/my_icons/fastai_logo.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;/div&gt;
 &lt;/div&gt;
