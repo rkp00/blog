@@ -1,0 +1,106 @@
+<h1 id="automated-street-lighting-using-arduino---an-iot-implementation">Automated Street Lighting using Arduino - An IoT implementation</h1>
+
+<p>Automatic street lighting system which senses amount of ambient light and accordingly switches on/off lights. Built using</p>
+<ul>
+  <li>an Arduino Uno and</li>
+  <li>a Raspberry Pi 3B+.</li>
+</ul>
+
+<p>The status of the entire system is updated in real-time onto a cloud based IoT dashboard(ThingSpeak) which can be monitored from anywhere in the world.</p>
+
+<p>This repository contains the Arudino sketch for the automated street lighting project.</p>
+
+<p>The sketch is written in C++.</p>
+
+<p>Replace your ssid and pass where asked.</p>
+
+<p>Enter your ThingSpeak channel’s API WRITE KEY in the updateTS function in place of “xxx”</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include&lt;SoftwareSerial.h&gt; //include the software serial library
+</span><span class="kt">int</span> <span class="n">sensor</span><span class="p">;</span> <span class="c1">//varialbe to store sensor values</span>
+<span class="kt">int</span> <span class="n">data</span><span class="p">;</span> <span class="c1">//variable to store mapped sensro values</span>
+<span class="kt">int</span> <span class="n">Light_status</span><span class="o">=</span><span class="mi">10</span><span class="p">;</span> <span class="c1">//var to store light status values</span>
+<span class="kt">int</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">38</span><span class="p">;</span>
+
+<span class="n">SoftwareSerial</span> <span class="nf">esp8266</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">);</span> <span class="c1">//set the software serial pins RX=3, TX=4</span>
+<span class="c1">//definition of variables</span>
+<span class="cp">#define SSID "xxx" //replace with ssid of wifi
+#define PASS "xxx" //replace with password of wifi
+</span>
+<span class="n">String</span> <span class="nf">sendAT</span><span class="p">(</span><span class="n">String</span> <span class="n">command</span><span class="p">,</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">timeout</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">String</span> <span class="n">response</span><span class="o">=</span><span class="s">""</span><span class="p">;</span>
+  <span class="n">esp8266</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">command</span><span class="p">);</span>
+  <span class="kt">long</span> <span class="kt">int</span> <span class="n">time</span> <span class="o">=</span> <span class="n">millis</span><span class="p">();</span>
+  <span class="k">while</span><span class="p">((</span><span class="n">time</span> <span class="o">+</span> <span class="n">timeout</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">millis</span><span class="p">()){</span>
+    <span class="k">while</span><span class="p">(</span><span class="n">esp8266</span><span class="p">.</span><span class="n">available</span><span class="p">()){</span>
+      <span class="kt">char</span> <span class="n">c</span> <span class="o">=</span> <span class="n">esp8266</span><span class="p">.</span><span class="n">read</span><span class="p">();</span>
+      <span class="n">response</span> <span class="o">+=</span> <span class="n">c</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">response</span><span class="p">);</span>
+  <span class="k">return</span> <span class="n">response</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">connectwifi</span><span class="p">(){</span>
+  <span class="n">sendAT</span><span class="p">(</span><span class="s">"AT</span><span class="se">\r\n</span><span class="s">"</span><span class="p">,</span><span class="mi">1000</span><span class="p">);</span> <span class="c1">//</span>
+  <span class="n">sendAT</span><span class="p">(</span><span class="s">"AT+CWMODE=1</span><span class="se">\r\n</span><span class="s">"</span><span class="p">,</span><span class="mi">1000</span><span class="p">);</span> 
+  <span class="c1">//call sendAT function to set esp8266 to station mode</span>
+  <span class="n">sendAT</span><span class="p">(</span><span class="s">"AT+CWJAP=</span><span class="se">\"</span><span class="s">"</span><span class="n">SSID</span><span class="s">"</span><span class="se">\"</span><span class="s">,</span><span class="se">\"</span><span class="s">"</span><span class="n">PASS</span><span class="s">"</span><span class="se">\"\r\n</span><span class="s">"</span><span class="p">,</span><span class="mi">2000</span><span class="p">);</span>
+  <span class="c1">//AT command to connect with the wifi network</span>
+  <span class="k">while</span><span class="p">(</span><span class="o">!</span><span class="n">esp8266</span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="s">"OK"</span><span class="p">)){</span>
+    <span class="c1">//wait for connection</span>
+    
+  <span class="p">}</span>
+  <span class="n">sendAT</span><span class="p">(</span><span class="s">"AT+CIFSR</span><span class="se">\r\n</span><span class="s">"</span><span class="p">,</span><span class="mi">1000</span><span class="p">);</span> <span class="c1">//AT command to print IP address on serial monitor</span>
+  <span class="n">sendAT</span><span class="p">(</span><span class="s">"AT+CIPMUX=0</span><span class="se">\r\n</span><span class="s">"</span><span class="p">,</span><span class="mi">1000</span><span class="p">);</span> <span class="c1">//AT command to set esp8266 to multiple connections</span>
+<span class="p">}</span>
+
+
+<span class="kt">void</span> <span class="nf">setup</span><span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// put your setup code here, to run once:</span>
+  <span class="n">Serial</span><span class="p">.</span><span class="n">begin</span><span class="p">(</span><span class="mi">9600</span><span class="p">);</span> <span class="c1">//begin the serial communication with baud rate 9600</span>
+  <span class="n">esp8266</span><span class="p">.</span><span class="n">begin</span><span class="p">(</span><span class="mi">9600</span><span class="p">);</span>
+  <span class="n">sendAT</span><span class="p">(</span><span class="s">"AT+RST</span><span class="se">\r\n</span><span class="s">"</span><span class="p">,</span><span class="mi">2000</span><span class="p">);</span> <span class="c1">//call sendAT function to send reset AT command</span>
+  <span class="n">connectwifi</span><span class="p">();</span> <span class="c1">//call connectwifi function to connect to wifi</span>
+  <span class="n">pinMode</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="n">OUTPUT</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">loop</span><span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// put your main code here, to run repeatedly:</span>
+  <span class="n">sensor</span><span class="o">=</span><span class="n">analogRead</span><span class="p">(</span><span class="n">A0</span><span class="p">);</span> <span class="c1">//read raw sensor data and store it</span>
+  <span class="n">data</span><span class="o">=</span><span class="n">map</span><span class="p">(</span><span class="n">sensor</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1023</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">);</span> <span class="c1">//map the raw sensor values and store the result in data</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">data</span><span class="o">&lt;</span><span class="n">threshold</span><span class="p">){</span> <span class="c1">//check of sensor value is less than threshold</span>
+    <span class="n">digitalWrite</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="n">HIGH</span><span class="p">);</span> <span class="c1">//switch on the light</span>
+    <span class="n">Light_status</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span> <span class="c1">//update Light status variable to 100</span>
+  <span class="p">}</span>
+  <span class="k">else</span><span class="p">{</span>
+    <span class="n">digitalWrite</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="n">LOW</span><span class="p">);</span> <span class="c1">//switch off the light</span>
+    <span class="n">Light_status</span><span class="o">=</span><span class="mi">10</span><span class="p">;</span> <span class="c1">//update the light_status variable to 10</span>
+  <span class="p">}</span>
+  <span class="n">String</span> <span class="n">sensor_value</span> <span class="o">=</span> <span class="n">String</span><span class="p">(</span><span class="n">data</span><span class="p">);</span> <span class="c1">//convert int to str</span>
+  <span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">"Light Intensity:"</span><span class="p">);</span>
+  <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="n">data</span><span class="p">);</span> <span class="c1">//print lighht status on serial monitor</span>
+
+  <span class="n">String</span> <span class="n">threshold1</span><span class="o">=</span> <span class="n">String</span><span class="p">(</span><span class="n">threshold</span><span class="p">);</span> <span class="c1">//convert int to str</span>
+  <span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">"Threshold:"</span><span class="p">);</span>
+  <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="n">threshold</span><span class="p">);</span> <span class="c1">// print threshold on serial monitor</span>
+
+  <span class="n">updateTS</span><span class="p">(</span><span class="n">sensor_value</span><span class="p">,</span><span class="n">Light_status</span><span class="p">,</span><span class="n">threshold</span><span class="p">);</span> <span class="c1">//call function toupdate Thingspeak</span>
+  <span class="n">delay</span><span class="p">(</span><span class="mi">3000</span><span class="p">);</span>
+<span class="p">}</span>
+
+  <span class="kt">void</span> <span class="nf">updateTS</span><span class="p">(</span><span class="n">String</span> <span class="n">S</span><span class="p">,</span><span class="n">String</span> <span class="n">L</span><span class="p">,</span> <span class="n">String</span> <span class="n">T</span><span class="p">){</span>
+  <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s">""</span><span class="p">);</span>
+  <span class="n">sendAT</span><span class="p">(</span><span class="s">"AT+CIPSTART=</span><span class="se">\"</span><span class="s">TCP</span><span class="se">\"</span><span class="s">,</span><span class="se">\"</span><span class="s">api.thingspeak.com</span><span class="se">\"</span><span class="s">,80</span><span class="se">\r\n</span><span class="s">"</span><span class="p">,</span><span class="mi">1000</span><span class="p">);</span>
+  <span class="n">delay</span><span class="p">(</span><span class="mi">2000</span><span class="p">);</span>
+  <span class="n">String</span> <span class="n">cmdlen</span><span class="p">;</span>
+  <span class="n">String</span> <span class="n">cmd</span> <span class="o">=</span> <span class="s">"GET /update?key=xxx&amp;field1="</span><span class="o">+</span><span class="n">L</span><span class="o">+</span><span class="s">"&amp;field2="</span><span class="o">+</span><span class="n">S</span><span class="o">+</span><span class="s">"field3="</span><span class="o">+</span><span class="n">T</span><span class="o">+</span><span class="s">"</span><span class="se">\r\n</span><span class="s">"</span><span class="p">;</span> <span class="c1">//update data to thingspeak</span>
+  <span class="n">cmdlen</span> <span class="o">=</span> <span class="n">cmd</span><span class="p">.</span><span class="n">length</span><span class="p">();</span>
+  <span class="n">sendAT</span><span class="p">(</span><span class="s">"AT+CIPSEND="</span><span class="o">+</span><span class="n">cmdlen</span><span class="o">+</span><span class="s">"</span><span class="se">\r\n</span><span class="s">"</span><span class="p">,</span><span class="mi">2000</span><span class="p">);</span>
+  <span class="n">esp8266</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">cmd</span><span class="p">);</span>
+  <span class="n">sendAT</span><span class="p">(</span><span class="s">"AT+CIPCLOSE</span><span class="se">\r\n</span><span class="s">"</span><span class="p">,</span><span class="mi">2000</span><span class="p">);</span>
+  <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s">""</span><span class="p">);</span>
+  <span class="n">delay</span><span class="p">(</span><span class="mi">1000</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>

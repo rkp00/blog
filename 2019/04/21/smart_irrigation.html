@@ -1,0 +1,98 @@
+<h1 id="smart-irrigation-system-using-iot">Smart Irrigation System using IoT</h1>
+
+<p>Automated Smart Irrigation system using IoT</p>
+
+<p>This repository contains the Arudino sketch for the automated smart irrigation project using iot.</p>
+
+<p>The sketch is written in C++.</p>
+
+<p>Replace your ssid and pass where asked.</p>
+
+<p>Enter your ThingSpeak channel’s API WRITE KEY in the updateTS function in place of “xxx”</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="cp">#include &lt;SoftwareSerial.h&gt;
+</span>
+<span class="kt">int</span> <span class="n">srdata</span><span class="p">;</span> <span class="c1">// variable to store raw sensor data</span>
+<span class="kt">int</span> <span class="n">prdata</span><span class="p">;</span> <span class="c1">// variable to store mapped sensor data</span>
+<span class="kt">int</span> <span class="n">pump_status</span><span class="p">;</span>
+<span class="n">SoftwareSerial</span> <span class="nf">esp8266</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">);</span>
+<span class="cp">#define SSID "xxx"
+#define PASS "xxx"
+</span>
+<span class="n">String</span> <span class="nf">sendAT</span><span class="p">(</span><span class="n">String</span> <span class="n">command</span><span class="p">,</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">timeout</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">String</span> <span class="n">response</span> <span class="o">=</span> <span class="s">""</span><span class="p">;</span>
+  <span class="n">esp8266</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">command</span><span class="p">);</span>
+  <span class="kt">long</span> <span class="kt">int</span> <span class="n">time</span> <span class="o">=</span> <span class="n">millis</span><span class="p">();</span>
+  <span class="k">while</span><span class="p">((</span><span class="n">time</span> <span class="o">+</span> <span class="n">timeout</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">millis</span><span class="p">())</span>
+  <span class="p">{</span>
+    <span class="k">while</span><span class="p">(</span><span class="n">esp8266</span><span class="p">.</span><span class="n">available</span><span class="p">())</span>
+    <span class="p">{</span>
+      <span class="kt">char</span> <span class="n">c</span> <span class="o">=</span> <span class="n">esp8266</span><span class="p">.</span><span class="n">read</span><span class="p">();</span>
+      <span class="n">response</span> <span class="o">+=</span> <span class="n">c</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">response</span><span class="p">);</span>
+  <span class="k">return</span> <span class="n">response</span><span class="p">;</span>
+<span class="p">}</span>
+
+
+<span class="kt">void</span> <span class="nf">setup</span><span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// put your setup code here, to run once:</span>
+<span class="n">Serial</span><span class="p">.</span><span class="n">begin</span><span class="p">(</span><span class="mi">9600</span><span class="p">);</span> <span class="c1">// start the serial communication with baud rate 9600</span>
+<span class="n">esp8266</span><span class="p">.</span><span class="n">begin</span><span class="p">(</span><span class="mi">9600</span><span class="p">);</span>
+<span class="n">sendAT</span><span class="p">(</span><span class="s">"AT+RST</span><span class="se">\r\n</span><span class="s">"</span><span class="p">,</span><span class="mi">2000</span><span class="p">);</span>
+<span class="n">sendAT</span><span class="p">(</span><span class="s">"AT</span><span class="se">\r\n</span><span class="s">"</span><span class="p">,</span><span class="mi">1000</span><span class="p">);</span>
+<span class="n">sendAT</span><span class="p">(</span><span class="s">"AT+CWMODE=1</span><span class="se">\r\n</span><span class="s">"</span><span class="p">,</span><span class="mi">1000</span><span class="p">);</span>
+<span class="n">sendAT</span><span class="p">(</span><span class="s">"AT+CWJAP=</span><span class="se">\"</span><span class="s">"</span><span class="n">SSID</span><span class="s">"</span><span class="se">\"</span><span class="s">,</span><span class="se">\"</span><span class="s">"</span><span class="n">PASS</span><span class="s">"</span><span class="se">\"\r\n</span><span class="s">"</span><span class="p">,</span><span class="mi">2000</span><span class="p">);</span>
+<span class="k">while</span><span class="p">(</span><span class="o">!</span><span class="n">esp8266</span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="s">"OK"</span><span class="p">))</span>
+<span class="p">{</span>
+  
+<span class="p">}</span>
+<span class="n">sendAT</span><span class="p">(</span><span class="s">"AT+CIFSR</span><span class="se">\r\n</span><span class="s">"</span><span class="p">,</span><span class="mi">1000</span><span class="p">);</span>
+<span class="n">sendAT</span><span class="p">(</span><span class="s">"AT+CIPMUX=0</span><span class="se">\r\n</span><span class="s">"</span><span class="p">,</span><span class="mi">1000</span><span class="p">);</span>
+
+<span class="n">pinMode</span><span class="p">(</span><span class="n">A0</span><span class="p">,</span><span class="n">INPUT</span><span class="p">);</span> <span class="c1">// set the A0 pin as an input</span>
+<span class="n">pinMode</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="n">OUTPUT</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">loop</span><span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// put your main code here, to run repeatedly:</span>
+  <span class="n">srdata</span><span class="o">=</span><span class="n">analogRead</span><span class="p">(</span><span class="n">A0</span><span class="p">);</span> <span class="c1">// read the sensor data and store it in srdata variable</span>
+  <span class="n">prdata</span><span class="o">=</span><span class="n">map</span><span class="p">(</span><span class="n">srdata</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1023</span><span class="p">,</span><span class="mi">100</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span> <span class="c1">// map the sensor data to range 0 to 100 using y=map(x,from low,from high, to low, to high) syntax</span>
+  <span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">"Sensor Data:"</span><span class="p">);</span> <span class="c1">// Print the words "Sensor Data:" on serial monitor</span>
+  <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="n">prdata</span><span class="p">);</span> <span class="c1">// Print the map sensor data on the serial monitor</span>
+  <span class="n">String</span> <span class="n">sensor_value</span> <span class="o">=</span> <span class="n">String</span><span class="p">(</span><span class="n">prdata</span><span class="p">);</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">prdata</span> <span class="o">&lt;</span> <span class="mi">50</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">digitalWrite</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="n">LOW</span><span class="p">);</span>
+    <span class="n">pump_status</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">else</span>
+  <span class="p">{</span>
+    <span class="n">digitalWrite</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="n">HIGH</span><span class="p">);</span>
+    <span class="n">pump_status</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="n">String</span> <span class="n">pump</span> <span class="o">=</span> <span class="n">String</span><span class="p">(</span><span class="n">pump_status</span><span class="p">);</span>
+  <span class="n">updateTS</span><span class="p">(</span><span class="n">sensor_value</span><span class="p">,</span><span class="n">pump</span><span class="p">);</span>
+  <span class="n">delay</span><span class="p">(</span><span class="mi">2000</span><span class="p">);</span> <span class="c1">// set a delay of 2 seconds before the next sensor data is fetched</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">updateTS</span><span class="p">(</span><span class="n">String</span> <span class="n">T</span><span class="p">,</span> <span class="n">String</span> <span class="n">P</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s">""</span><span class="p">);</span>
+  <span class="n">sendAT</span><span class="p">(</span><span class="s">"AT+CIPSTART=</span><span class="se">\"</span><span class="s">TCP</span><span class="se">\"</span><span class="s">,</span><span class="se">\"</span><span class="s">api.thingspeak.com</span><span class="se">\"</span><span class="s">,80</span><span class="se">\r\n</span><span class="s">"</span><span class="p">,</span><span class="mi">1000</span><span class="p">);</span>
+  <span class="n">delay</span><span class="p">(</span><span class="mi">2000</span><span class="p">);</span>
+  <span class="n">String</span> <span class="n">cmdlen</span><span class="p">;</span>
+  <span class="n">String</span> <span class="n">cmd</span> <span class="o">=</span> <span class="s">"GET /update?key=xxx&amp;field1="</span><span class="o">+</span><span class="n">T</span><span class="o">+</span><span class="s">"&amp;field2="</span><span class="o">+</span><span class="n">P</span><span class="o">+</span><span class="s">"</span><span class="se">\r\n</span><span class="s">"</span><span class="p">;</span>
+  <span class="n">cmdlen</span> <span class="o">=</span> <span class="n">cmd</span><span class="p">.</span><span class="n">length</span><span class="p">();</span>
+  <span class="n">sendAT</span><span class="p">(</span><span class="s">"AT+CIPSEND="</span><span class="o">+</span><span class="n">cmdlen</span><span class="o">+</span><span class="s">"</span><span class="se">\r\n</span><span class="s">"</span><span class="p">,</span><span class="mi">2000</span><span class="p">);</span>
+  <span class="n">esp8266</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">cmd</span><span class="p">);</span>
+  <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s">""</span><span class="p">);</span>
+  <span class="n">sendAT</span><span class="p">(</span><span class="s">"AT+CIPCLOSE</span><span class="se">\r\n</span><span class="s">"</span><span class="p">,</span><span class="mi">2000</span><span class="p">);</span>
+  <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s">""</span><span class="p">);</span>
+  <span class="n">delay</span><span class="p">(</span><span class="mi">15000</span><span class="p">);</span>
+  
+<span class="p">}</span>
+</code></pre></div></div>

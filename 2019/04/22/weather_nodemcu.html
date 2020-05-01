@@ -1,0 +1,99 @@
+<h1 id="weather-station-on-nodemcu">Weather Station on NodeMCU</h1>
+
+<p>Smart Weather Monitor Using nodemcu</p>
+
+<p>This repository contains the sketch for the weather monitor using nodemcu project</p>
+
+<p>The sketch is written in C++.</p>
+
+<p>Replace your ssid and pass where asked.</p>
+
+<p>Enter your ThingSpeak channel’s API WRITE KEY in the updateTS function in place of “xxx”</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;ESP8266WiFi.h&gt;
+</span>
+
+<span class="cp">#include &lt;DHT.h&gt;  // Including library for dht
+</span>
+
+ 
+<span class="n">String</span> <span class="n">apiKey</span> <span class="o">=</span> <span class="s">"xxx"</span><span class="p">;</span>     <span class="c1">//  Enter your Write API key from ThingSpeak</span>
+
+<span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">ssid</span> <span class="o">=</span>  <span class="s">"xxx"</span><span class="p">;</span>     <span class="c1">// replace with your wifi ssid and wpa2 key</span>
+<span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">pass</span> <span class="o">=</span>  <span class="s">"xxx"</span><span class="p">;</span>
+<span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">server</span> <span class="o">=</span> <span class="s">"api.thingspeak.com"</span><span class="p">;</span>
+
+<span class="cp">#define DHTPIN 0          //pin where the dht11 is connected
+</span> 
+<span class="n">DHT</span> <span class="nf">dht</span><span class="p">(</span><span class="n">DHTPIN</span><span class="p">,</span> <span class="n">DHT11</span><span class="p">);</span>
+
+<span class="n">WiFiClient</span> <span class="n">client</span><span class="p">;</span>
+ 
+<span class="kt">void</span> <span class="nf">setup</span><span class="p">()</span> 
+<span class="p">{</span>
+       <span class="n">Serial</span><span class="p">.</span><span class="n">begin</span><span class="p">(</span><span class="mi">115200</span><span class="p">);</span>
+       <span class="n">delay</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+       <span class="n">dht</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span>
+ 
+       <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s">"Connecting to "</span><span class="p">);</span>
+       <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="n">ssid</span><span class="p">);</span>
+ 
+ 
+       <span class="n">WiFi</span><span class="p">.</span><span class="n">begin</span><span class="p">(</span><span class="n">ssid</span><span class="p">,</span> <span class="n">pass</span><span class="p">);</span>
+ 
+      <span class="k">while</span> <span class="p">(</span><span class="n">WiFi</span><span class="p">.</span><span class="n">status</span><span class="p">()</span> <span class="o">!=</span> <span class="n">WL_CONNECTED</span><span class="p">)</span> 
+     <span class="p">{</span>
+            <span class="n">delay</span><span class="p">(</span><span class="mi">500</span><span class="p">);</span>
+            <span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">"."</span><span class="p">);</span>
+     <span class="p">}</span>
+      <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s">""</span><span class="p">);</span>
+      <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s">"WiFi connected"</span><span class="p">);</span>
+ 
+<span class="p">}</span>
+ 
+<span class="kt">void</span> <span class="nf">loop</span><span class="p">()</span> 
+<span class="p">{</span>
+  
+      <span class="kt">float</span> <span class="n">h</span> <span class="o">=</span> <span class="n">dht</span><span class="p">.</span><span class="n">readHumidity</span><span class="p">();</span>
+      <span class="kt">float</span> <span class="n">t</span> <span class="o">=</span> <span class="n">dht</span><span class="p">.</span><span class="n">readTemperature</span><span class="p">();</span>
+      
+              <span class="k">if</span> <span class="p">(</span><span class="n">isnan</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="o">||</span> <span class="n">isnan</span><span class="p">(</span><span class="n">t</span><span class="p">))</span> 
+                 <span class="p">{</span>
+                     <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s">"Failed to read from DHT sensor!"</span><span class="p">);</span>
+                      <span class="k">return</span><span class="p">;</span>
+                 <span class="p">}</span>
+
+                         <span class="k">if</span> <span class="p">(</span><span class="n">client</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span><span class="n">server</span><span class="p">,</span><span class="mi">80</span><span class="p">))</span>   <span class="c1">//   "184.106.153.149" or api.thingspeak.com</span>
+                      <span class="p">{</span>  
+                            
+                             <span class="n">String</span> <span class="n">postStr</span> <span class="o">=</span> <span class="n">apiKey</span><span class="p">;</span>
+                             <span class="n">postStr</span> <span class="o">+=</span><span class="s">"&amp;field1="</span><span class="p">;</span>
+                             <span class="n">postStr</span> <span class="o">+=</span> <span class="n">String</span><span class="p">(</span><span class="n">t</span><span class="p">);</span>
+                             <span class="n">postStr</span> <span class="o">+=</span><span class="s">"&amp;field2="</span><span class="p">;</span>
+                             <span class="n">postStr</span> <span class="o">+=</span> <span class="n">String</span><span class="p">(</span><span class="n">h</span><span class="p">);</span>
+                             <span class="n">postStr</span> <span class="o">+=</span> <span class="s">"</span><span class="se">\r\n\r\n</span><span class="s">"</span><span class="p">;</span>
+ 
+                             <span class="n">client</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">"POST /update HTTP/1.1</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+                             <span class="n">client</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">"Host: api.thingspeak.com</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+                             <span class="n">client</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">"Connection: close</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+                             <span class="n">client</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">"X-THINGSPEAKAPIKEY: "</span><span class="o">+</span><span class="n">apiKey</span><span class="o">+</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+                             <span class="n">client</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">"Content-Type: application/x-www-form-urlencoded</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+                             <span class="n">client</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">"Content-Length: "</span><span class="p">);</span>
+                             <span class="n">client</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">postStr</span><span class="p">.</span><span class="n">length</span><span class="p">());</span>
+                             <span class="n">client</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n\n</span><span class="s">"</span><span class="p">);</span>
+                             <span class="n">client</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">postStr</span><span class="p">);</span>
+ 
+                             <span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">"Temperature: "</span><span class="p">);</span>
+                             <span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">t</span><span class="p">);</span>
+                             <span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">" degrees Celcius, Humidity: "</span><span class="p">);</span>
+                             <span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">h</span><span class="p">);</span>
+                             <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s">"%. Send to Thingspeak."</span><span class="p">);</span>
+                        <span class="p">}</span>
+          <span class="n">client</span><span class="p">.</span><span class="n">stop</span><span class="p">();</span>
+ 
+          <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s">"Waiting..."</span><span class="p">);</span>
+  
+  <span class="c1">// thingspeak needs minimum 15 sec delay between updates, i've set it to 30 seconds</span>
+  <span class="n">delay</span><span class="p">(</span><span class="mi">10000</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
