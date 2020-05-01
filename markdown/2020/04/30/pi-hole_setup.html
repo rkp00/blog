@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Configuring Pi-Hole with DNS over HTTPS | Rohith’s blog</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Configuring Pi-Hole with DNS over HTTPS" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Pi-Hole DNS sink over HTTPS" />
+<meta property="og:description" content="Pi-Hole DNS sink over HTTPS" />
+<link rel="canonical" href="https://rkp00.github.io/blog/markdown/2020/04/30/pi-hole_setup.html" />
+<meta property="og:url" content="https://rkp00.github.io/blog/markdown/2020/04/30/pi-hole_setup.html" />
+<meta property="og:site_name" content="Rohith’s blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-04-30T00:00:00-05:00" />
+<script type="application/ld+json">
+{"description":"Pi-Hole DNS sink over HTTPS","@type":"BlogPosting","headline":"Configuring Pi-Hole with DNS over HTTPS","dateModified":"2020-04-30T00:00:00-05:00","datePublished":"2020-04-30T00:00:00-05:00","url":"https://rkp00.github.io/blog/markdown/2020/04/30/pi-hole_setup.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://rkp00.github.io/blog/markdown/2020/04/30/pi-hole_setup.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://rkp00.github.io/blog/feed.xml" title="Rohith's blog" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Configuring Pi-Hole with DNS over HTTPS | Rohith’s blog</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Configuring Pi-Hole with DNS over HTTPS" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Pi-Hole DNS sink over HTTPS" />
+<meta property="og:description" content="Pi-Hole DNS sink over HTTPS" />
+<link rel="canonical" href="https://rkp00.github.io/blog/markdown/2020/04/30/pi-hole_setup.html" />
+<meta property="og:url" content="https://rkp00.github.io/blog/markdown/2020/04/30/pi-hole_setup.html" />
+<meta property="og:site_name" content="Rohith’s blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-04-30T00:00:00-05:00" />
+<script type="application/ld+json">
+{"description":"Pi-Hole DNS sink over HTTPS","@type":"BlogPosting","headline":"Configuring Pi-Hole with DNS over HTTPS","dateModified":"2020-04-30T00:00:00-05:00","datePublished":"2020-04-30T00:00:00-05:00","url":"https://rkp00.github.io/blog/markdown/2020/04/30/pi-hole_setup.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://rkp00.github.io/blog/markdown/2020/04/30/pi-hole_setup.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css"><link type="application/atom+xml" rel="alternate" href="https://rkp00.github.io/blog/feed.xml" title="Rohith's blog" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+<script type="text/javascript">
+require.config({
+  paths: {
+    jquery: 'https://code.jquery.com/jquery-3.5.0.min',
+    plotly: 'https://cdn.plot.ly/plotly-latest.min'
+  },
+
+  shim: {
+    plotly: {
+      deps: ['jquery'],
+      exports: 'plotly'
+    }
+  }
+});
+</script>
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head><body><header class="site-header">
+
+  <div class="wrapper">
+<a class="site-title" rel="author" href="/blog/">Rohith's blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewbox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+<a class="page-link" href="/blog/about/">About Me</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a>
+</div>
+      </nav>
+</div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Configuring Pi-Hole with DNS over HTTPS</h1>
+<p class="page-description">Pi-Hole DNS sink over HTTPS</p>
+<p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-04-30T00:00:00-05:00" itemprop="datePublished">
+        Apr 30, 2020
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      1 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#markdown">markdown</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h1"><a href="#pi-hole-dns-over-https">Pi-Hole DNS over HTTPS</a></li>
+</ul>
+<h1 id="pi-hole-dns-over-https">
+<a class="anchor" href="#pi-hole-dns-over-https" aria-hidden="true"><span class="octicon octicon-link"></span></a>Pi-Hole DNS over HTTPS</h1>
+<p>I just set up <a href="https://en.wikipedia.org/wiki/DNS_over_HTTPS">DNS over HTTPS</a> using <a href="https://docs.pi-hole.net/guides/dns-over-https/">this guide</a> on my <a href="https://pi-hole.net">pi-hole</a> DNS sink.</p>
+
+<p>Basically,</p>
+
+<ol>
+  <li>
+    <p>Get the <a href="https://developers.cloudflare.com/1.1.1.1/dns-over-https/cloudflared-proxy/">cloudflared</a> daemon compiled for ARM (Raspberry Pi)</p>
+  </li>
+  <li>
+    <p>Configure it as a service that runs on startup under a user named cloudflared</p>
+  </li>
+  <li>
+    <p>Use systemd to start the service (or reboot, I guess?)</p>
+  </li>
+</ol>
+
+<p>Ultimately this still goes to Cloudflare’s 1.1.1.1 DNS, except routed over HTTPS:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Commandline args for cloudflared</span>
+<span class="nv">CLOUDFLARED_OPTS</span><span class="o">=</span><span class="nt">--port</span> 5053 <span class="nt">--upstream</span> https://1.1.1.1/dns-query <span class="nt">--upstream</span> https://1.0.0.1/dns-query
+</code></pre></div></div>
+<p>Why? Basically, with traditional HTTPS people don’t know what you are browsing (because it’s encrypted) but they can <em>definitely tell what website (domain name) you are looking at</em>.</p>
+
+<p>Even if you are visiting a site using HTTPS, your DNS query is sent over an unencrypted connection. That means that even if you are browsing https://cloudflare.com, anyone listening to packets on the network knows you are attempting to visit cloudflare.com.</p>
+
+<p>The second problem with unencrypted DNS is that it is easy for a Man-In-The-Middle to change DNS answers to route unsuspecting visitors to their phishing, malware or surveillance site. DNSSEC solves this problem as well by providing a mechanism to check the validity of a DNS answer, but only a single-digit percentage of domains use DNSSEC.</p>
+
+<p>With DNS over HTTPS, a man in the middle can’t see the content, nor can they tell what website you are on. Also prevents tampering with DNS as as side benefit. <img class="emoji" title=":sweat_smile:" alt=":sweat_smile:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f605.png" height="20" width="20"></p>
+
+  </div>
+<a class="u-url" href="/blog/markdown/2020/04/30/pi-hole_setup.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>I write about tech.</p>
+      </div>
+    </div>
+
+    <div class="social-links">
+<ul class="social-media-list">
+<li><a rel="me" href="https://github.com/kprohith" title="kprohith"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li>
+<li><a rel="me" href="https://www.linkedin.com/in/rohith-kp" title="rohith-kp"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#linkedin"></use></svg></a></li>
+<li><a rel="me" href="https://twitter.com/fortytwochars" title="fortytwochars"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#twitter"></use></svg></a></li>
+</ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

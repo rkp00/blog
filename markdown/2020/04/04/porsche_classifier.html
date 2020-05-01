@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Porsche Classifier | Rohith’s blog</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Porsche Classifier" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Identify Porsche models(718, 911, Taycan, Macan, Cayenne, Panamera) with 95% accuracy." />
+<meta property="og:description" content="Identify Porsche models(718, 911, Taycan, Macan, Cayenne, Panamera) with 95% accuracy." />
+<link rel="canonical" href="https://rkp00.github.io/blog/markdown/2020/04/04/porsche_classifier.html" />
+<meta property="og:url" content="https://rkp00.github.io/blog/markdown/2020/04/04/porsche_classifier.html" />
+<meta property="og:site_name" content="Rohith’s blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-04-04T00:00:00-05:00" />
+<script type="application/ld+json">
+{"description":"Identify Porsche models(718, 911, Taycan, Macan, Cayenne, Panamera) with 95% accuracy.","@type":"BlogPosting","headline":"Porsche Classifier","dateModified":"2020-04-04T00:00:00-05:00","datePublished":"2020-04-04T00:00:00-05:00","url":"https://rkp00.github.io/blog/markdown/2020/04/04/porsche_classifier.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://rkp00.github.io/blog/markdown/2020/04/04/porsche_classifier.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://rkp00.github.io/blog/feed.xml" title="Rohith's blog" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Porsche Classifier | Rohith’s blog</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Porsche Classifier" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Identify Porsche models(718, 911, Taycan, Macan, Cayenne, Panamera) with 95% accuracy." />
+<meta property="og:description" content="Identify Porsche models(718, 911, Taycan, Macan, Cayenne, Panamera) with 95% accuracy." />
+<link rel="canonical" href="https://rkp00.github.io/blog/markdown/2020/04/04/porsche_classifier.html" />
+<meta property="og:url" content="https://rkp00.github.io/blog/markdown/2020/04/04/porsche_classifier.html" />
+<meta property="og:site_name" content="Rohith’s blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-04-04T00:00:00-05:00" />
+<script type="application/ld+json">
+{"description":"Identify Porsche models(718, 911, Taycan, Macan, Cayenne, Panamera) with 95% accuracy.","@type":"BlogPosting","headline":"Porsche Classifier","dateModified":"2020-04-04T00:00:00-05:00","datePublished":"2020-04-04T00:00:00-05:00","url":"https://rkp00.github.io/blog/markdown/2020/04/04/porsche_classifier.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://rkp00.github.io/blog/markdown/2020/04/04/porsche_classifier.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css"><link type="application/atom+xml" rel="alternate" href="https://rkp00.github.io/blog/feed.xml" title="Rohith's blog" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+<script type="text/javascript">
+require.config({
+  paths: {
+    jquery: 'https://code.jquery.com/jquery-3.5.0.min',
+    plotly: 'https://cdn.plot.ly/plotly-latest.min'
+  },
+
+  shim: {
+    plotly: {
+      deps: ['jquery'],
+      exports: 'plotly'
+    }
+  }
+});
+</script>
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head><body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/blog/">Rohith&#39;s blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/blog/about/">About Me</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Porsche Classifier</h1><p class="page-description">Identify [Porsche](https://porsche.com) models(718, 911, Taycan, Macan, Cayenne, Panamera) with 95% accuracy.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-04-04T00:00:00-05:00" itemprop="datePublished">
+        Apr 4, 2020
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      14 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#markdown">markdown</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h1"><a href="#porsche-classifier">Porsche Classifier</a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#porsche-classifier-1">Porsche Classifier</a></li>
+<li class="toc-entry toc-h2"><a href="#identify-porsche-models718-911-taycan-macan-cayenne-panamera-with-95-accuracy">Identify Porsche models(718, 911, Taycan, Macan, Cayenne, Panamera) with 95% accuracy.</a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#trained-using-fastai-v3-pytorch-and-gradient">Trained using fastai-v3, pytorch and Gradient.</a></li>
+<li class="toc-entry toc-h3"><a href="#uses-resnet50-and-trained-on-a-nvidia-quadro-p5000">Uses resnet50 and trained on a Nvidia Quadro P5000.</a></li>
+<li class="toc-entry toc-h3"><a href="#built-on-docker-and-is-hosted-on-render">Built on docker and is hosted on render.</a></li>
+<li class="toc-entry toc-h3"><a href="#trained-on-a-dataset-of-publicly-sourced-images-containing-30000-porsche-car-models-of-varying-degree-of-quality">Trained on a dataset of publicly sourced images containing 30000 Porsche car models of varying degree of quality.</a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#creating-your-own-dataset-from-google-images">Creating your own dataset from Google Images</a></li>
+<li class="toc-entry toc-h2"><a href="#get-a-list-of-urls">Get a list of URLs</a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#search-and-scroll">Search and scroll</a></li>
+<li class="toc-entry toc-h3"><a href="#download-into-file">Download into file</a></li>
+<li class="toc-entry toc-h3"><a href="#create-directory-and-upload-urls-file-into-your-server">Create directory and upload urls file into your server</a></li>
+<li class="toc-entry toc-h3"><a href="#download-images">Download images</a></li>
+<li class="toc-entry toc-h3"><a href="#view-data">View data</a></li>
+<li class="toc-entry toc-h3"><a href="#train-model">Train model</a></li>
+<li class="toc-entry toc-h3"><a href="#interpretation">Interpretation</a></li>
+<li class="toc-entry toc-h3"><a href="#cleaning-up">Cleaning Up</a></li>
+<li class="toc-entry toc-h3"><a href="#putting-your-model-in-production">Putting your model in production</a></li>
+<li class="toc-entry toc-h3"><a href="#things-that-can-go-wrong">Things that can go wrong</a></li>
+<li class="toc-entry toc-h3"><a href="#learning-rate-lr-too-high">Learning rate (LR) too high</a></li>
+<li class="toc-entry toc-h3"><a href="#learning-rate-lr-too-low">Learning rate (LR) too low</a></li>
+<li class="toc-entry toc-h3"><a href="#too-few-epochs">Too few epochs</a></li>
+<li class="toc-entry toc-h3"><a href="#too-many-epochs">Too many epochs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul><h1 id="porsche-classifier">
+<a class="anchor" href="#porsche-classifier" aria-hidden="true"><span class="octicon octicon-link"></span></a>Porsche Classifier</h1>
+
+<h2 id="porsche-classifier-1">
+<a class="anchor" href="#porsche-classifier-1" aria-hidden="true"><span class="octicon octicon-link"></span></a><a href="https://porsche-classifier-8d1k.onrender.com/">Porsche Classifier</a>
+</h2>
+<h2 id="identify-porsche-models718-911-taycan-macan-cayenne-panamera-with-95-accuracy">
+<a class="anchor" href="#identify-porsche-models718-911-taycan-macan-cayenne-panamera-with-95-accuracy" aria-hidden="true"><span class="octicon octicon-link"></span></a>Identify <a href="https://porsche.com">Porsche</a> models(718, 911, Taycan, Macan, Cayenne, Panamera) with 95% accuracy.</h2>
+
+<h3 id="trained-using-fastai-v3-pytorch-and-gradient">
+<a class="anchor" href="#trained-using-fastai-v3-pytorch-and-gradient" aria-hidden="true"><span class="octicon octicon-link"></span></a>Trained using <a href="https://fast.ai">fastai-v3</a>, <a href="https://pytorch.org/">pytorch</a> and <a href="https://gradient.paperspace.com/">Gradient</a>.</h3>
+<h3 id="uses-resnet50-and-trained-on-a-nvidia-quadro-p5000">
+<a class="anchor" href="#uses-resnet50-and-trained-on-a-nvidia-quadro-p5000" aria-hidden="true"><span class="octicon octicon-link"></span></a>Uses <a href="https://www.mathworks.com/help/deeplearning/ref/resnet50.html">resnet50</a> and trained on a <a href="https://images.nvidia.com/content/pdf/quadro/data-sheets/192195-DS-NV-Quadro-P5000-US-12Sept-NV-FNL-WEB.pdf">Nvidia Quadro P5000</a>.</h3>
+<h3 id="built-on-docker-and-is-hosted-on-render">
+<a class="anchor" href="#built-on-docker-and-is-hosted-on-render" aria-hidden="true"><span class="octicon octicon-link"></span></a>Built on <a href="https://www.docker.com/">docker</a> and is hosted on <a href="https://render.com/">render</a>.</h3>
+<h3 id="trained-on-a-dataset-of-publicly-sourced-images-containing-30000-porsche-car-models-of-varying-degree-of-quality">
+<a class="anchor" href="#trained-on-a-dataset-of-publicly-sourced-images-containing-30000-porsche-car-models-of-varying-degree-of-quality" aria-hidden="true"><span class="octicon octicon-link"></span></a>Trained on a dataset of publicly sourced images containing 30000 Porsche car models of varying degree of quality.</h3>
+<p>Porsche cars, specially the latest generations of the Panamera/Taycan,Macan/Cayenne &amp; 911/718 can be  pretty tricky to tell apart for a layman who isn’t paying very close attention, which is why I wanted to test out what kind of features this deep learning model would pick up.</p>
+
+<h2 id="creating-your-own-dataset-from-google-images">
+<a class="anchor" href="#creating-your-own-dataset-from-google-images" aria-hidden="true"><span class="octicon octicon-link"></span></a>Creating your own dataset from Google Images</h2>
+<p>In this tutorial we will see how to easily create an image dataset through Google Images. Note: You will have to repeat these steps for any new category you want to Google (e.g once for dogs and once for cats).</p>
+
+<ol id="markdown-toc">
+  <li>
+<a href="#porsche-classifier" id="markdown-toc-porsche-classifier">Porsche Classifier</a>    <ol>
+      <li><a href="#porsche-classifier-1" id="markdown-toc-porsche-classifier-1">Porsche Classifier</a></li>
+      <li>
+<a href="#identify-porsche-models718-911-taycan-macan-cayenne-panamera-with-95-accuracy" id="markdown-toc-identify-porsche-models718-911-taycan-macan-cayenne-panamera-with-95-accuracy">Identify Porsche models(718, 911, Taycan, Macan, Cayenne, Panamera) with 95% accuracy.</a>        <ol>
+          <li><a href="#trained-using-fastai-v3-pytorch-and-gradient" id="markdown-toc-trained-using-fastai-v3-pytorch-and-gradient">Trained using fastai-v3, pytorch and Gradient.</a></li>
+          <li><a href="#uses-resnet50-and-trained-on-a-nvidia-quadro-p5000" id="markdown-toc-uses-resnet50-and-trained-on-a-nvidia-quadro-p5000">Uses resnet50 and trained on a Nvidia Quadro P5000.</a></li>
+          <li><a href="#built-on-docker-and-is-hosted-on-render" id="markdown-toc-built-on-docker-and-is-hosted-on-render">Built on docker and is hosted on render.</a></li>
+          <li><a href="#trained-on-a-dataset-of-publicly-sourced-images-containing-30000-porsche-car-models-of-varying-degree-of-quality" id="markdown-toc-trained-on-a-dataset-of-publicly-sourced-images-containing-30000-porsche-car-models-of-varying-degree-of-quality">Trained on a dataset of publicly sourced images containing 30000 Porsche car models of varying degree of quality.</a></li>
+        </ol>
+      </li>
+      <li><a href="#creating-your-own-dataset-from-google-images" id="markdown-toc-creating-your-own-dataset-from-google-images">Creating your own dataset from Google Images</a></li>
+      <li>
+<a href="#get-a-list-of-urls" id="markdown-toc-get-a-list-of-urls">Get a list of URLs</a>        <ol>
+          <li><a href="#search-and-scroll" id="markdown-toc-search-and-scroll">Search and scroll</a></li>
+          <li><a href="#download-into-file" id="markdown-toc-download-into-file">Download into file</a></li>
+          <li><a href="#create-directory-and-upload-urls-file-into-your-server" id="markdown-toc-create-directory-and-upload-urls-file-into-your-server">Create directory and upload urls file into your server</a></li>
+          <li><a href="#download-images" id="markdown-toc-download-images">Download images</a></li>
+          <li><a href="#view-data" id="markdown-toc-view-data">View data</a></li>
+          <li><a href="#train-model" id="markdown-toc-train-model">Train model</a></li>
+          <li><a href="#interpretation" id="markdown-toc-interpretation">Interpretation</a></li>
+          <li><a href="#cleaning-up" id="markdown-toc-cleaning-up">Cleaning Up</a></li>
+          <li><a href="#putting-your-model-in-production" id="markdown-toc-putting-your-model-in-production">Putting your model in production</a></li>
+          <li><a href="#things-that-can-go-wrong" id="markdown-toc-things-that-can-go-wrong">Things that can go wrong</a></li>
+          <li><a href="#learning-rate-lr-too-high" id="markdown-toc-learning-rate-lr-too-high">Learning rate (LR) too high</a></li>
+          <li><a href="#learning-rate-lr-too-low" id="markdown-toc-learning-rate-lr-too-low">Learning rate (LR) too low</a></li>
+          <li><a href="#too-few-epochs" id="markdown-toc-too-few-epochs">Too few epochs</a></li>
+          <li><a href="#too-many-epochs" id="markdown-toc-too-many-epochs">Too many epochs</a></li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+</ol>
+
+<p>In [0]:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>from fastai.vision import *
+</code></pre></div></div>
+<h2 id="get-a-list-of-urls">
+<a class="anchor" href="#get-a-list-of-urls" aria-hidden="true"><span class="octicon octicon-link"></span></a>Get a list of URLs</h2>
+<h3 id="search-and-scroll">
+<a class="anchor" href="#search-and-scroll" aria-hidden="true"><span class="octicon octicon-link"></span></a>Search and scroll</h3>
+<p>Go to Google Images and search for the images you are interested in. The more specific you are in your Google Search, the better the results and the less manual pruning you will have to do.</p>
+
+<p>Scroll down until you’ve seen all the images you want to download, or until you see a button that says ‘Show more results’. All the images you scrolled past are now available to download. To get more, click on the button, and continue scrolling. The maximum number of images Google Images shows is 700.</p>
+
+<p>It is a good idea to put things you want to exclude into the search query, for instance if you are searching for the Eurasian wolf, “canis lupus lupus”, it might be a good idea to exclude other variants:</p>
+
+<p>“canis lupus lupus” -dog -arctos -familiaris -baileyi -occidentalis</p>
+
+<p>You can also limit your results to show only photos by clicking on Tools and selecting Photos from the Type dropdown.</p>
+
+<h3 id="download-into-file">
+<a class="anchor" href="#download-into-file" aria-hidden="true"><span class="octicon octicon-link"></span></a>Download into file</h3>
+<p>Now you must run some Javascript code in your browser which will save the URLs of all the images you want for you dataset.</p>
+
+<p>In Google Chrome press CtrlShiftj on Windows/Linux and CmdOptj on macOS, and a small window the javascript ‘Console’ will appear. In Firefox press CtrlShiftk on Windows/Linux or CmdOptk on macOS. That is where you will paste the JavaScript commands.</p>
+
+<p>You will need to get the urls of each of the images. Before running the following commands, you may want to disable ad blocking extensions (uBlock, AdBlockPlus etc.) in Chrome. Otherwise the window.open() command doesn’t work. Then you can run the following commands:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>urls=Array.from(document.querySelectorAll('.rg_i')).map(el=&gt; el.hasAttribute('data-src')?el.getAttribute('data-src'):el.getAttribute('data-iurl'));
+window.open('data:text/csv;charset=utf-8,' + escape(urls.join('\n')));
+</code></pre></div></div>
+<h3 id="create-directory-and-upload-urls-file-into-your-server">
+<a class="anchor" href="#create-directory-and-upload-urls-file-into-your-server" aria-hidden="true"><span class="octicon octicon-link"></span></a>Create directory and upload urls file into your server</h3>
+<p>Choose an appropriate name for your labeled images. You can run these steps multiple times to create different labels.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>In [0]:
+folder = '718'
+file = '718.csv'
+In [0]:
+folder = '911'
+file = '911.csv'
+In [0]:
+folder = 'cayenne'
+file = 'cayenne.csv'
+In [0]:
+folder = 'macan'
+file = 'macan.csv'
+In [0]:
+folder = 'taycan'
+file = 'taycan.csv'
+In [0]:
+folder = 'panamera'
+file = 'panamera.csv'
+</code></pre></div></div>
+<p>You will need to run this cell once per each category.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>In [0]:
+path = Path('data/porsche')
+dest = path/folder
+dest.mkdir(parents=True, exist_ok=True)
+In [0]:
+path.ls()
+Out[0]:
+[PosixPath('data/porsche/cayenne'),
+ PosixPath('data/porsche/panamera.csv'),
+ PosixPath('data/porsche/cayenne.csv'),
+ PosixPath('data/porsche/panamera'),
+ PosixPath('data/porsche/taycan'),
+ PosixPath('data/porsche/911.csv'),
+ PosixPath('data/porsche/taycan.csv'),
+ PosixPath('data/porsche/911'),
+ PosixPath('data/porsche/macan.csv'),
+ PosixPath('data/porsche/718'),
+ PosixPath('data/porsche/718.csv'),
+ PosixPath('data/porsche/macan')]
+</code></pre></div></div>
+<p>Finally, upload your urls file. You just need to press ‘Upload’ in your working directory and select your file, then click ‘Upload’ for each of the displayed files.</p>
+
+<p><code class="highlighter-rouge">uploaded file</code></p>
+
+<h3 id="download-images">
+<a class="anchor" href="#download-images" aria-hidden="true"><span class="octicon octicon-link"></span></a>Download images</h3>
+<p>Now you will need to download your images from their respective urls.</p>
+
+<p>fast.ai has a function that allows you to do just that. You just have to specify the urls filename as well as the destination folder and this function will download and save all images that can be opened. If they have some problem in being opened, they will not be saved.</p>
+
+<p>Let’s download our images! Notice you can choose a maximum number of images to be downloaded. In this case we will not download all the urls.</p>
+
+<p>You will need to run this line once for every category.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>In [0]:
+classes = ['taycan','panamera','macan','cayenne','718','911']
+In [0]:
+download_images(path/file, dest, max_pics=500)
+
+In [0]:
+# If you have problems download, try with `max_workers=0` to see exceptions:
+download_images(path/file, dest, max_pics=20, max_workers=0)
+</code></pre></div></div>
+<p>Then we can remove any images that can’t be opened:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>In [0]:
+for c in classes:
+    print(c)
+    verify_images(path/c, delete=True, max_size=500)
+taycan
+panamera
+macan
+cayenne
+718
+911
+</code></pre></div></div>
+<h3 id="view-data">
+<a class="anchor" href="#view-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>View data</h3>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>In [0]:
+np.random.seed(42)
+data = ImageDataBunch.from_folder(path, train=".", valid_pct=0.2,
+        ds_tfms=get_transforms(), size=224, num_workers=4).normalize(imagenet_stats)
+
+In [0]:
+#If you already cleaned your data, run this cell instead of the one before
+ np.random.seed(42)
+ data = ImageDataBunch.from_csv(path, folder=".", valid_pct=0.2, csv_labels='cleaned.csv',
+         ds_tfms=get_transforms(), size=224, num_workers=4).normalize(imagenet_stats)
+</code></pre></div></div>
+<p>Good! Let’s take a look at some of our pictures then.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>In [0]:
+data.classes
+Out[0]:
+['718', '911', 'cayenne', 'macan', 'panamera', 'taycan']
+In [0]:
+data.show_batch(rows=6, figsize=(7,8))
+
+In [0]:
+data.classes, data.c, len(data.train_ds), len(data.valid_ds)
+Out[0]:
+(['718', '911', 'cayenne', 'macan', 'panamera', 'taycan'], 6, 1920, 480)
+</code></pre></div></div>
+<h3 id="train-model">
+<a class="anchor" href="#train-model" aria-hidden="true"><span class="octicon octicon-link"></span></a>Train model</h3>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>In [0]:
+learn = cnn_learner(data, models.resnet50, metrics=error_rate)
+In [0]:
+learn.fit_one_cycle(40)
+</code></pre></div></div>
+<p>epoch | train_loss | valid_loss | error_rate | time
+—– | ———- | ———- | ———- | —- 
+0 | 2.608914 | 1.610778 | 0.606250 | 00:09
+1 | 2.229989 | 1.467350 | 0.531250 | 00:09
+2 | 1.992984 | 1.457949 | 0.495833 | 00:10
+3 | 1.800289 | 1.435493 | 0.481250 | 00:09
+4 | 1.639752 | 1.454458 | 0.479167 | 00:09
+5 | 1.502409 | 1.400133 | 0.464583 | 00:09
+6 | 1.371669 | 1.300878 | 0.450000 | 00:10
+7 | 1.258696 | 1.236995 | 0.418750 | 00:09
+8 | 1.138708 | 1.241532 | 0.418750 | 00:09
+9 | 1.043424 | 1.175137 | 0.406250 | 00:10
+10 | 0.984921 | 1.146469 | 0.385417 | 00:10
+11 | 0.927935 | 1.169490 | 0.379167 | 00:10
+12 | 0.876125 | 1.170498 | 0.391667 | 00:10
+13 | 0.825623 | 1.195051 | 0.375000 | 00:10
+14 | 0.765536 | 1.155461 | 0.364583 | 00:10
+15 | 0.727942 | 1.145015 | 0.381250 | 00:10
+16 | 0.688683 | 1.260339 | 0.387500 | 00:10
+17 | 0.637377 | 1.175742 | 0.366667 | 00:10
+18 | 0.608817 | 1.228916 | 0.385417 | 00:10
+19 | 0.572675 | 1.248361 | 0.379167 | 00:09
+20 | 0.555676 | 1.256141 | 0.364583 | 00:10
+21 | 0.511557 | 1.273524 | 0.375000 | 00:10
+22 | 0.483267 | 1.251337 | 0.362500 | 00:10
+23 | 0.436271 | 1.288411 | 0.354167 | 00:10
+24 | 0.415738 | 1.234846 | 0.364583 | 00:10
+25 | 0.397631 | 1.279648 | 0.354167 | 00:10
+26 | 0.377773 | 1.224547 | 0.347917 | 00:10
+27 | 0.352112 | 1.226564 | 0.339583 | 00:09
+28 | 0.338672 | 1.195467 | 0.341667 | 00:10
+29 | 0.328226 | 1.212193 | 0.347917 | 00:10
+30 | 0.296725 | 1.213175 | 0.339583 | 00:10
+31 | 0.290399 | 1.222019 | 0.327083 | 00:10
+32 | 0.263940 | 1.222777 | 0.327083 | 00:10
+33 | 0.258763 | 1.207108 | 0.322917 | 00:10
+34 | 0.253563 | 1.217487 | 0.329167 | 00:10
+35 | 0.236343 | 1.217709 | 0.322917 | 00:10
+36 | 0.221070 | 1.228969 | 0.325000 | 00:10
+37 | 0.230405 | 1.240643 | 0.327083 | 00:10
+38 | 0.217511 | 1.230480 | 0.318750 | 00:10
+39 | 0.209594 | 1.243002 | 0.318750 | 00:10</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>In [0]:
+learn.save('stage-1')
+In [0]:
+learn.unfreeze()
+In [0]:
+learn.lr_find()
+25.00% [1/4 00:12&lt;00:37]
+</code></pre></div></div>
+<p>epoch |	train_loss | valid_loss | error_rate | time
+—– | ———- | ———- | ———- | —-
+0 |	0.196860 | #na# | 00:12</p>
+
+<p>83.33% [25/30 00:10&lt;00:02 0.6416]
+LR Finder is complete, type {learner_name}.recorder.plot() to see the graph.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>In [0]:
+# If the plot is not showing try to give a start and end learning rate
+# learn.lr_find(start_lr=1e-5, end_lr=1e-1)
+learn.recorder.plot()
+
+In [0]:
+learn.fit_one_cycle(2, max_lr=slice(3e-5,3e-4))
+epoch	train_loss	valid_loss	error_rate	time
+0	0.280386	1.524914	0.372917	00:13
+1	0.276844	1.312542	0.345833	00:13
+In [0]:
+learn.save('stage-2')
+</code></pre></div></div>
+<h3 id="interpretation">
+<a class="anchor" href="#interpretation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Interpretation</h3>
+<p>In [0]:
+learn.load(‘stage-2’);
+In [0]:
+interp = ClassificationInterpretation.from_learner(learn)
+In [0]:
+interp.plot_confusion_matrix()</p>
+
+<h3 id="cleaning-up">
+<a class="anchor" href="#cleaning-up" aria-hidden="true"><span class="octicon octicon-link"></span></a>Cleaning Up</h3>
+<p>Some of our top losses aren’t due to bad performance by our model. There are images in our data set that shouldn’t be.</p>
+
+<p>Using the ImageCleaner widget from fastai.widgets we can prune our top losses, removing photos that don’t belong.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>In [0]:
+from fastai.widgets import *
+</code></pre></div></div>
+<p>First we need to get the file paths from our top_losses. We can do this with .from_toplosses. We then feed the top losses indexes and corresponding dataset to ImageCleaner.</p>
+
+<p>Notice that the widget will not delete images directly from disk but it will create a new csv file cleaned.csv from where you can create a new ImageDataBunch with the corrected labels to continue training your model.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>In [0]:
+db = (ImageList.from_folder(path)
+                   .split_none()
+                   .label_from_folder()
+                   .transform(get_transforms(), size=224)
+                   .databunch()
+     )
+In [0]:
+# If you already cleaned your data using indexes from `from_toplosses`,
+# run this cell instead of the one before to proceed with removing duplicates.
+# Otherwise all the results of the previous step would be overwritten by
+# the new run of `ImageCleaner`.
+
+ db = (ImageList.from_csv(path, 'cleaned.csv', folder='.')
+                    .split_none()
+                   .label_from_df()
+                   .transform(get_transforms(), size=224)
+                   .databunch()
+     )
+</code></pre></div></div>
+<p>Then we create a new learner to use our new databunch with all the images.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>In [0]:
+learn_cln = cnn_learner(db, models.resnet50, metrics=error_rate)
+
+learn_cln.load('stage-2');
+In [0]:
+ds, idxs = DatasetFormatter().from_toplosses(learn_cln)
+In [0]:
+# Don't run this in google colab or any other instances running jupyter lab.
+# If you do run this on Jupyter Lab, you need to restart your runtime and
+# runtime state including all local variables will be lost.
+ImageCleaner(ds, idxs, path)
+</code></pre></div></div>
+<p>HBox(children=(VBox(children=(Image(value=b’\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x01\x00d\x00d\x00\x00\xff…
+Button(button_style=’primary’, description=’Next Batch’, layout=Layout(width=’auto’), style=ButtonStyle())
+Flag photos for deletion by clicking ‘Delete’. Then click ‘Next Batch’ to delete flagged photos and keep the rest in that row. ImageCleaner will show you a new row of images until there are no more to show. In this case, the widget will show you images until there are none left from top_losses.ImageCleaner(ds, idxs)</p>
+
+<p>You can also find duplicates in your dataset and delete them! To do this, you need to run .from_similars to get the potential duplicates’ ids and then run ImageCleaner with duplicates=True. The API works in a similar way as with misclassified images: just choose the ones you want to delete and click ‘Next Batch’ until there are no more images left.</p>
+
+<p>Make sure to recreate the databunch and learn_cln from the cleaned.csv file. Otherwise the file would be overwritten from scratch, losing all the results from cleaning the data from toplosses.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>In [0]:
+ds, idxs = DatasetFormatter().from_similars(learn_cln)
+Getting activations...
+100.00% [36/36 00:05&lt;00:00]
+Computing similarities...
+In [0]:
+ImageCleaner(ds, idxs, path, duplicates=True)
+HBox(children=(VBox(children=(Image(value=b'\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x01\x00d\x00d\x00\x00\xff…
+Button(button_style='primary', description='Next Batch', layout=Layout(width='auto'), style=ButtonStyle())
+</code></pre></div></div>
+<p>Remember to recreate your ImageDataBunch from your cleaned.csv to include the changes you made in your data!</p>
+
+<h3 id="putting-your-model-in-production">
+<a class="anchor" href="#putting-your-model-in-production" aria-hidden="true"><span class="octicon octicon-link"></span></a>Putting your model in production</h3>
+<p>First thing first, let’s export the content of our Learner object for production:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>In [0]:
+learn.export()
+</code></pre></div></div>
+<p>This will create a file named ‘export.pkl’ in the directory where we were working that contains everything we need to deploy our model (the model, the weights but also some metadata like the classes or the transforms/normalization used).</p>
+
+<p>You probably want to use CPU for inference, except at massive scale (and you almost certainly don’t need to train in real-time). If you don’t have a GPU that happens automatically. You can test your model on CPU like so:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>In [0]:
+defaults.device = torch.device('cpu')
+In [0]:
+img = open_image(path/'download.jpg')
+img
+Out[0]:
+</code></pre></div></div>
+<p>We create our Learner in production enviromnent like this, just make sure that path contains the file ‘export.pkl’ from before.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>In [0]:
+
+In [0]:
+learn = load_learner(path)
+In [0]:
+pred_class,pred_idx,outputs = learn.predict(img)
+pred_class
+Out[0]:
+Category panamera
+</code></pre></div></div>
+<p>So you might create a route something like this (thanks to Simon Willison for the structure of this code):</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@app.route("/classify-url", methods=["GET"])
+async def classify_url(request):
+    bytes = await get_bytes(request.query_params["url"])
+    img = open_image(BytesIO(bytes))
+    _,_,losses = learner.predict(img)
+    return JSONResponse({
+        "predictions": sorted(
+            zip(cat_learner.data.classes, map(float, losses)),
+            key=lambda p: p[1],
+            reverse=True
+        )
+    })
+(This example is for the Starlette web app toolkit.)
+</code></pre></div></div>
+<h3 id="things-that-can-go-wrong">
+<a class="anchor" href="#things-that-can-go-wrong" aria-hidden="true"><span class="octicon octicon-link"></span></a>Things that can go wrong</h3>
+<p>Most of the time things will train fine with the defaults
+There’s not much you really need to tune (despite what you’ve heard!)
+Most likely are
+Learning rate
+Number of epochs</p>
+
+<h3 id="learning-rate-lr-too-high">
+<a class="anchor" href="#learning-rate-lr-too-high" aria-hidden="true"><span class="octicon octicon-link"></span></a>Learning rate (LR) too high</h3>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>In [0]:
+learn = cnn_learner(data, models.resnet34, metrics=error_rate)
+In [0]:
+learn.fit_one_cycle(1, max_lr=0.5)
+</code></pre></div></div>
+<p>Total time: 00:13
+epoch  train_loss  valid_loss  error_rate     <br>
+1      12.220007   1144188288.000000  0.765957    (00:13)</p>
+
+<h3 id="learning-rate-lr-too-low">
+<a class="anchor" href="#learning-rate-lr-too-low" aria-hidden="true"><span class="octicon octicon-link"></span></a>Learning rate (LR) too low</h3>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>In [0]:
+learn = cnn_learner(data, models.resnet34, metrics=error_rate)
+</code></pre></div></div>
+<p>Previously we had this result:</p>
+
+<p>Total time: 00:57
+epoch | train_loss | valid_loss | error_rate
+—– | ———- | ———- | ———-
+1 | 1.030236 | 0.179226 | 0.028369 | (00:14)
+2 |  0.561508 | 0.055464 | 0.014184 | (00:13)
+3 |   0.396103 | 0.053801 | 0.014184 | (00:13)
+4 |   0.316883 | 0.050197 | 0.021277 | (00:15)</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>In [0]:
+learn.fit_one_cycle(5, max_lr=1e-5)
+</code></pre></div></div>
+<p>Total time: 01:07
+epoch | train_loss |  valid_loss |  error_rate
+—– | ———- | ———– | ———–
+1 |   1.349151 | 1.062807 | 0.609929 | (00:13)
+2 |   1.373262 | 1.045115 | 0.546099 | (00:13)
+3 |   1.346169 | 1.006288 | 0.468085 | (00:13)
+4 |   1.334486 | 0.978713 | 0.453901 | (00:13)
+5 |   1.320978 | 0.978108 | 0.446809 | (00:13)</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>In [0]:
+learn.recorder.plot_losses()
+</code></pre></div></div>
+<p>As well as taking a really long time, it’s getting too many looks at each image, so may overfit.</p>
+
+<h3 id="too-few-epochs">
+<a class="anchor" href="#too-few-epochs" aria-hidden="true"><span class="octicon octicon-link"></span></a>Too few epochs</h3>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>In [0]:
+learn = cnn_learner(data, models.resnet34, metrics=error_rate, pretrained=False)
+In [0]:
+learn.fit_one_cycle(1)
+</code></pre></div></div>
+<p>Total time: 00:14
+epoch  train_loss  valid_loss  error_rate
+1      0.602823    0.119616    0.049645    (00:14)</p>
+
+<h3 id="too-many-epochs">
+<a class="anchor" href="#too-many-epochs" aria-hidden="true"><span class="octicon octicon-link"></span></a>Too many epochs</h3>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>In [0]:
+np.random.seed(42)
+data = ImageDataBunch.from_folder(path, train=".", valid_pct=0.9, bs=32, 
+        ds_tfms=get_transforms(do_flip=False, max_rotate=0, max_zoom=1, max_lighting=0, max_warp=0
+                              ),size=224, num_workers=4).normalize(imagenet_stats)
+In [0]:
+learn = cnn_learner(data, models.resnet50, metrics=error_rate, ps=0, wd=0)
+learn.unfreeze()
+In [0]:
+learn.fit_one_cycle(40, slice(1e-6,1e-4))
+Total time: 06:39
+</code></pre></div></div>
+
+<table>
+  <thead>
+    <tr>
+      <th>epoch</th>
+      <th>train_loss</th>
+      <th>valid_loss</th>
+      <th>error_rate</th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>1.513021</td>
+      <td>1.041628</td>
+      <td>0.507326</td>
+      <td>(00:13)</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>1.290093</td>
+      <td>0.994758</td>
+      <td>0.443223</td>
+      <td>(00:09)</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>1.185764</td>
+      <td>0.936145</td>
+      <td>0.410256</td>
+      <td>(00:09)</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>1.117229</td>
+      <td>0.838402</td>
+      <td>0.322344</td>
+      <td>(00:09)</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>1.022635</td>
+      <td>0.734872</td>
+      <td>0.252747</td>
+      <td>(00:09)</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>0.951374</td>
+      <td>0.627288</td>
+      <td>0.192308</td>
+      <td>(00:10)</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>0.916111</td>
+      <td>0.558621</td>
+      <td>0.184982</td>
+      <td>(00:09)</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>0.839068</td>
+      <td>0.503755</td>
+      <td>0.177656</td>
+      <td>(00:09)</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>0.749610</td>
+      <td>0.433475</td>
+      <td>0.144689</td>
+      <td>(00:09)</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>0.678583</td>
+      <td>0.367560</td>
+      <td>0.124542</td>
+      <td>(00:09)</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td>0.615280</td>
+      <td>0.327029</td>
+      <td>0.100733</td>
+      <td>(00:10)</td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td>0.558776</td>
+      <td>0.298989</td>
+      <td>0.095238</td>
+      <td>(00:09)</td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td>0.518109</td>
+      <td>0.266998</td>
+      <td>0.084249</td>
+      <td>(00:09)</td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td>0.476290</td>
+      <td>0.257858</td>
+      <td>0.084249</td>
+      <td>(00:09)</td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td>0.436865</td>
+      <td>0.227299</td>
+      <td>0.067766</td>
+      <td>(00:09)</td>
+    </tr>
+    <tr>
+      <td>16</td>
+      <td>0.457189</td>
+      <td>0.236593</td>
+      <td>0.078755</td>
+      <td>(00:10)</td>
+    </tr>
+    <tr>
+      <td>17</td>
+      <td>0.420905</td>
+      <td>0.240185</td>
+      <td>0.080586</td>
+      <td>(00:10)</td>
+    </tr>
+    <tr>
+      <td>18</td>
+      <td>0.395686</td>
+      <td>0.255465</td>
+      <td>0.082418</td>
+      <td>(00:09)</td>
+    </tr>
+    <tr>
+      <td>19</td>
+      <td>0.373232</td>
+      <td>0.263469</td>
+      <td>0.080586</td>
+      <td>(00:09)</td>
+    </tr>
+    <tr>
+      <td>20</td>
+      <td>0.348988</td>
+      <td>0.258300</td>
+      <td>0.080586</td>
+      <td>(00:10)</td>
+    </tr>
+    <tr>
+      <td>21</td>
+      <td>0.324616</td>
+      <td>0.261346</td>
+      <td>0.080586</td>
+      <td>(00:09)</td>
+    </tr>
+    <tr>
+      <td>22</td>
+      <td>0.311310</td>
+      <td>0.236431</td>
+      <td>0.071429</td>
+      <td>(00:09)</td>
+    </tr>
+    <tr>
+      <td>23</td>
+      <td>0.328342</td>
+      <td>0.245841</td>
+      <td>0.069597</td>
+      <td>(00:10)</td>
+    </tr>
+    <tr>
+      <td>24</td>
+      <td>0.306411</td>
+      <td>0.235111</td>
+      <td>0.064103</td>
+      <td>(00:10)</td>
+    </tr>
+    <tr>
+      <td>25</td>
+      <td>0.289134</td>
+      <td>0.227465</td>
+      <td>0.069597</td>
+      <td>(00:09)</td>
+    </tr>
+    <tr>
+      <td>26</td>
+      <td>0.284814</td>
+      <td>0.226022</td>
+      <td>0.064103</td>
+      <td>(00:09)</td>
+    </tr>
+    <tr>
+      <td>27</td>
+      <td>0.268398</td>
+      <td>0.222791</td>
+      <td>0.067766</td>
+      <td>(00:09)</td>
+    </tr>
+    <tr>
+      <td>28</td>
+      <td>0.255431</td>
+      <td>0.227751</td>
+      <td>0.073260</td>
+      <td>(00:10)</td>
+    </tr>
+    <tr>
+      <td>29</td>
+      <td>0.240742</td>
+      <td>0.235949</td>
+      <td>0.071429</td>
+      <td>(00:09)</td>
+    </tr>
+    <tr>
+      <td>30</td>
+      <td>0.227140</td>
+      <td>0.225221</td>
+      <td>0.075092</td>
+      <td>(00:09)</td>
+    </tr>
+    <tr>
+      <td>31</td>
+      <td>0.213877</td>
+      <td>0.214789</td>
+      <td>0.069597</td>
+      <td>(00:09)</td>
+    </tr>
+    <tr>
+      <td>32</td>
+      <td>0.201631</td>
+      <td>0.209382</td>
+      <td>0.062271</td>
+      <td>(00:10)</td>
+    </tr>
+    <tr>
+      <td>33</td>
+      <td>0.189988</td>
+      <td>0.210684</td>
+      <td>0.065934</td>
+      <td>(00:09)</td>
+    </tr>
+    <tr>
+      <td>34</td>
+      <td>0.181293</td>
+      <td>0.214666</td>
+      <td>0.073260</td>
+      <td>(00:09)</td>
+    </tr>
+    <tr>
+      <td>35</td>
+      <td>0.184095</td>
+      <td>0.222575</td>
+      <td>0.073260</td>
+      <td>(00:09)</td>
+    </tr>
+    <tr>
+      <td>36</td>
+      <td>0.194615</td>
+      <td>0.229198</td>
+      <td>0.076923</td>
+      <td>(00:10)</td>
+    </tr>
+    <tr>
+      <td>37</td>
+      <td>0.186165</td>
+      <td>0.218206</td>
+      <td>0.075092</td>
+      <td>(00:09)</td>
+    </tr>
+    <tr>
+      <td>38</td>
+      <td>0.176623</td>
+      <td>0.207198</td>
+      <td>0.062271</td>
+      <td>(00:10)</td>
+    </tr>
+    <tr>
+      <td>39</td>
+      <td>0.166854</td>
+      <td>0.207256</td>
+      <td>0.065934</td>
+      <td>(00:10)</td>
+    </tr>
+    <tr>
+      <td>40</td>
+      <td>0.162692</td>
+      <td>0.206044</td>
+      <td>0.062271</td>
+      <td>(00:09)</td>
+    </tr>
+  </tbody>
+</table>
+
+  </div><a class="u-url" href="/blog/markdown/2020/04/04/porsche_classifier.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>I write about tech.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/kprohith" title="kprohith"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://www.linkedin.com/in/rohith-kp" title="rohith-kp"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#linkedin"></use></svg></a></li><li><a rel="me" href="https://twitter.com/fortytwochars" title="fortytwochars"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
