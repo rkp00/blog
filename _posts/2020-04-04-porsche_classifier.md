@@ -1,7 +1,7 @@
 ---
 toc: true
 layout: post
-description: Identify [Porsche](https://porsche.com) models(718, 911, Taycan, Macan, Cayenne, Panamera) with 95% accuracy.
+description: Identify Porsche models(718, 911, Taycan, Macan, Cayenne, Panamera) with 95 % accuracy.
 categories: [markdown]
 title: Porsche Classifier
 ---
