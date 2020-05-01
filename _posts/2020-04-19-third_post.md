@@ -1,6 +1,6 @@
 # Writing with Word
 
-## Let’s see if this works using pandocs.
+pandocs
 
 TEST
 

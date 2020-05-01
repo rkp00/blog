@@ -1,3 +1,12 @@
+---
+toc: true
+layout: post
+description: Automated Smart Building using IoT
+categories: [markdown]
+title: Smart Presence Sensing System - IoT enabled Smart Building
+
+---
+
 # Smart Presence Sensing System - IoT enabled Smart Building
 
 Automated Smart Building using IoT

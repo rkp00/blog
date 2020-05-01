@@ -1,3 +1,11 @@
+---
+toc: true
+layout: post
+description: Python workflow for analysing stocks using mahcine learning
+categories: [markdown]
+title: NSE Stock Analysis using ML
+---
+
 # NSE Stock Analysis using ML
 
 

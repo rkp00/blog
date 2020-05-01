@@ -1,3 +1,11 @@
+---
+toc: true
+layout: post
+description: Smart Water Meter using IoT
+categories: [markdown]
+title: Smart Water Meter using an Arduino - An IoT Implementation
+
+---
 # Smart Water Meter using an Arduino - An IoT Implementation
 
 Smart Water Meter using IoT

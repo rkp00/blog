@@ -1,6 +1,14 @@
-# TicTacToe in python - Commandline
+---
+toc: true
+layout: post
+description: TicTacToe in Python
+categories: [markdown]
+title: TicTacToe in python - Commandline
+---
 
-##  TicTacToe - commandline
+
+# TicTacToe in Python - Commandline
+
 
 ###  A text-based version of the [popular two player game](https://en.wikipedia.org/wiki/Tic-tac-toe).
 

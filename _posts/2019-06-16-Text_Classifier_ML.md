@@ -1,3 +1,12 @@
+---
+toc: true
+layout: post
+description: Basic text classifier that uses tensor-flow and keras api inorder to classify text
+categories: [markdown]
+title: Text-Classifier-ML
+
+---
+
 # Text-Classifier-ML
 
 ## Basic text classifier that uses [tensor-flow](https:/tensorflow.org) and [keras api](https://keras.io) inorder to classify text as:

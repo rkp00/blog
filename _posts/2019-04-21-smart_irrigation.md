@@ -1,3 +1,11 @@
+---
+toc: true
+layout: post
+description: Automated Smart Irrigation system using IoT
+categories: [markdown]
+title: Smart Irrigation System using IoT
+---
+
 # Smart Irrigation System using IoT 
 
 Automated Smart Irrigation system using IoT

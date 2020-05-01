@@ -1,3 +1,12 @@
+---
+toc: true
+layout: post
+description: Smart Weather Monitor Using nodemcu
+categories: [markdown]
+title: Weather Station on NodeMCU
+
+---
+
 # Weather Station on NodeMCU
 
 Smart Weather Monitor Using nodemcu

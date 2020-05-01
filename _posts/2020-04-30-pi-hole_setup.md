@@ -1,3 +1,11 @@
+---
+toc: true
+layout: post
+description: Pi-Hole DNS sink over HTTPS
+categories: [markdown]
+title: Configuring Pi-Hole with DNS over HTTPS
+---
+
 # Pi-Hole DNS over HTTPS
 I just set up [DNS over HTTPS](https://en.wikipedia.org/wiki/DNS_over_HTTPS) using [this guide](https://docs.pi-hole.net/guides/dns-over-https/) on my [pi-hole](https://pi-hole.net) DNS sink.
 

@@ -1,3 +1,13 @@
+---
+toc: true
+layout: post
+description: Basic classifier that is trained to classify images of clothing into 10 categories
+categories: [markdown]
+title: Clothing Classifier
+
+
+---
+
 # Clothing Classifier
 
 ## Basic classifier that is trained to classify images of clothing into [10 categories](https://github.com/zalandoresearch/fashion-mnist#labels)

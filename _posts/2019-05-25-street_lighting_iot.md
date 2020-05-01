@@ -1,3 +1,11 @@
+---
+toc: true
+layout: post
+description: Automatic street lighting system which senses amount of ambient light and accordingly switches on/off lights.
+categories: [markdown]
+title: Automated Street Lighting using Arduino - An IoT implementation
+---
+
 # Automated Street Lighting using Arduino - An IoT implementation
 
 Automatic street lighting system which senses amount of ambient light and accordingly switches on/off lights. Built using 
