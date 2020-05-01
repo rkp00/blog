@@ -4,7 +4,12 @@ title: About Me
 permalink: /about/
 ---
 
-This is where you put the contents of your *About* page. Like all your pages, it's in [Markdown](https://guides.github.com/features/mastering-markdown/) format.
+
+<div class="LI-profile-badge"  data-version="v1" data-size="large" data-locale="en_US" data-type="horizontal" data-theme="dark" data-vanity="rohith-kp"><a class="LI-simple-link" href='https://in.linkedin.com/in/rohith-kp?trk=profile-badge'>Rohith Palakirti</a></div>
+
+
+
+
 
 This website is powered by **[fastpages](https://github.com/fastai/fastpages)** [^1].
 
