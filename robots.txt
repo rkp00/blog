@@ -1,1 +1,1 @@
-Sitemap: https://www.rkpblog.tech/sitemap.xml
+Sitemap: /sitemap.xml
